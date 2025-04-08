@@ -1,75 +1,78 @@
-const { MongoClient } = require('mongodb'); // Fixed typo from 'NonpoClient'
+const express = require('express');
+const { MongoClient, ObjectId } = require('mongodb');
+const port = 3000;
+const app = express();
 
-// Define drivers array correctly
-const drivers = [
-    {
-        name: "John Doe",
-        vehicleType: "Sedan",
-        isAvailable: true,
-        rating: 4.8
-    },
-    {
-        name: "Alice Smith",
-        vehicleType: "SUV",
-        isAvailable: false,
-        rating: 4.5
-    }
-];
+app.use(express.json());
 
-// Show all data in console
-console.log("All drivers:", drivers);
+let db;
 
-// Show all driver names
-drivers.forEach(driver => console.log(driver.name));
-
-// Add new driver
-drivers.push({
-    name: "Bob Johnson",
-    vehicleType: "Truck",
-    isAvailable: true,
-    rating: 4.7
-});
-
-async function main() {
-    const uri = "mongodb://localhost:27017"; // Replace with your MongoDB connection string
+async function connectToMongoDB() {
+    const uri = "mongodb://localhost:27017";
     const client = new MongoClient(uri);
-
     try {
         await client.connect();
-        const db = client.db("testDB");
-        const driversCollection = db.collection("drivers");
-
-        // Task 3: Insert all drivers
-        await Promise.all(drivers.map(async (driver) => {
-            const result = await driversCollection.insertOne(driver);
-            console.log(`New driver created with result: ${JSON.stringify(result)}`);
-        }));
-
-        // Task 4: Query available drivers with rating >= 4.5
-        const availableDrivers = await driversCollection.find({
-            isAvailable: true,
-            rating: { $gte: 4.5 }
-        }).toArray();
-        console.log("Available drivers:", availableDrivers);
-
-        // Task 5: Update John Doe's rating
-        const updateResult = await driversCollection.updateOne(
-            { name: "John Doe" },
-            { $inc: { rating: 0.1 } }
-        );
-        console.log('Driver updated with result:', updateResult);
-
-        // Task 6: Delete unavailable drivers
-        const deleteResult = await driversCollection.deleteOne(
-            { isAvailable: false }
-        );
-        console.log('Driver deleted with result:', deleteResult);
-
-    } catch (error) {
-        console.error("Error:", error);
-    } finally {
-        await client.close();
+        console.log("Connected to MongoDB");
+        db = client.db("testDB");
+    } catch (err) {
+        console.error("Error:", err);
     }
 }
 
-main();
+connectToMongoDB();
+
+app.get('/rides', async (req, res) => {
+    try {
+        const rides = await db.collection('rides').find().toArray();
+        res.status(200).json(rides);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch rides" });
+    }
+});
+
+app.post('/rides', async (req, res) => {
+    try {
+        const ride = req.body; // Fixed: Extract ride from request body
+        const result = await db.collection('rides').insertOne(ride);
+        res.status(201).json({ message: "Ride created", id: result.insertedId });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to create ride" });
+    }
+});
+
+app.patch('/rides/:id', async (req, res) => {
+    try {
+        const rideId = req.params.id;
+        const { status } = req.body;
+        const result = await db.collection('rides').updateOne(
+            { _id: new ObjectId(rideId) },
+            { $set: { status } }
+        );
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: "Ride not found" });
+        }
+        res.status(200).json({ message: "Ride status updated", modifiedCount: result.modifiedCount });
+    } catch (err) {
+        console.error("PATCH Error:", err); // Optional: for debugging
+        res.status(500).json({ error: "Failed to update ride" });
+    }
+});
+
+app.delete('/rides/:id', async (req, res) => {
+    try {
+        const rideId = req.params.id;
+        const result = await db.collection('rides').deleteOne(
+            { _id: new ObjectId(rideId) }
+        );
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: "Ride not found" });
+        }
+        res.status(200).json({ message: "Ride deleted" });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to delete ride" });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
