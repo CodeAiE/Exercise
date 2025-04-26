@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Management Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .form-container, .ride-list, .user-table-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-container input, .form-container button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: calc(100% - 20px);
+            box-sizing: border-box;
+        }
+        .form-container button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+        .ride-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ride-item button {
+            padding: 5px 10px;
+            background-color: #DC3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ride Management Dashboard</h1>
+
+    <!-- Add New Ride Form -->
+    <div class="form-container">
+        <h2>Add New Ride</h2>
+        <form id="createRideForm">
+            <input type="text" id="ridePickup" placeholder="Pickup Location" required><br>
+            <input type="text" id="rideDestination" placeholder="Destination" required><br>
+            <input type="text" id="rideDriverId" placeholder="Driver ID" required><br>
+            <button type="submit">Add Ride</button>
+        </form>
+    </div>
+
+    <!-- Ride List -->
+    <div class="ride-list">
+        <h2>Rides</h2>
+        <div id="ridesList"></div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="user-table-container">
+        <h2>Users</h2>
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+        </table>
+    </div>
+
+    <div class="form-container">
+        <h2>Create a User</h2>
+        <form id="createUserForm">
+            <input type="text" id="userUsername" placeholder="Username" required><br>
+            <input type="email" id="userEmail" placeholder="Email" required><br>
+            <select id="userRole" required>
+                <option value="customer">Customer</option>
+                <option value="driver">Driver</option>
+            </select><br>
+            <button type="submit">Create User</button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // Fetch and display rides
+        async function fetchRides() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/rides`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const rides = await response.json();
+                const ridesList = document.getElementById('ridesList');
+                ridesList.innerHTML = '';
+                rides.forEach(ride => {
+                    const rideDiv = document.createElement('div');
+                    rideDiv.className = 'ride-item';
+                    rideDiv.innerHTML = `
+                        <div>
+                            <strong>${ride.pickupLocation} to ${ride.destination}</strong><br>
+                            Driver ID: ${ride.driverId}
+                        </div>
+                        <button onclick="cancelRide('${ride._id}')">Cancelled</button>
+                    `;
+                    ridesList.appendChild(rideDiv);
+                });
+            } catch (error) {
+                console.error('Error fetching rides:', error);
+                console.error('Error details:', error.message, error.stack);
+                alert('Failed to fetch rides: ' + error.message);
+            }
+        }
+
+        // Fetch and display users
+        async function fetchUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/user`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const users = await response.json();
+                const usersBody = document.getElementById('usersBody');
+                usersBody.innerHTML = '';
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user._id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                    `;
+                    usersBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                console.error('Error details:', error.message, error.stack);
+                alert('Failed to fetch users: ' + error.message);
+            }
+        }
+
+        // Create a new ride
+        document.getElementById('createRideForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ride = {
+                pickupLocation: document.getElementById('ridePickup').value,
+                destination: document.getElementById('rideDestination').value,
+                driverId: document.getElementById('rideDriverId').value,
+                status: 'requested' // Default status as per API logic
+            };
+            try {
+                const response = await fetch(`${API_BASE_URL}/rides`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(ride)
+                });
+                if (response.ok) {
+                    alert('Ride created successfully');
+                    fetchRides();
+                    e.target.reset();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create ride');
+                }
+            } catch (error) {
+                console.error('Error creating ride:', error);
+                alert('Failed to create ride: ' + error.message);
+            }
+        });
+
+        // Create a new user
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = {
+                username: document.getElementById('userUsername').value,
+                email: document.getElementById('userEmail').value,
+                role: document.getElementById('userRole').value
+            };
+            try {
+                const response = await fetch(`${API_BASE_URL}/user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+                if (response.ok) {
+                    alert('User created successfully');
+                    fetchUsers();
+                    e.target.reset();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create user');
+                }
+            } catch (error) {
+                console.error('Error creating user:', error);
+                alert('Failed to create user: ' + error.message);
+            }
+        });
+
+        // Cancel a ride (update status to 'cancelled')
+        async function cancelRide(rideId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/rides/${rideId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                if (response.ok) {
+                    alert('Ride cancelled');
+                    fetchRides();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to cancel ride');
+                }
+            } catch (error) {
+                console.error('Error cancelling ride:', error);
+                alert('Failed to cancel ride: ' + error.message);
+            }
+        }
+
+        // Initial fetch
+        fetchRides();
+        fetchUsers();
+    </script>
+</body>
+</html>
