@@ -1,262 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ride Management Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        .form-container, .ride-list, .user-table-container {
-            margin: 20px 0;
-            padding: 20px;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .form-container input, .form-container button {
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            width: calc(100% - 20px);
-            box-sizing: border-box;
-        }
-        .form-container button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            width: auto;
-        }
-        .ride-item {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 3px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .ride-item button {
-            padding: 5px 10px;
-            background-color: #DC3545;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #007BFF;
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ride-Hailing App - Login & Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Ride Management Dashboard</h1>
-
-    <!-- Add New Ride Form -->
-    <div class="form-container">
-        <h2>Add New Ride</h2>
-        <form id="createRideForm">
-            <input type="text" id="ridePickup" placeholder="Pickup Location" required><br>
-            <input type="text" id="rideDestination" placeholder="Destination" required><br>
-            <input type="text" id="rideDriverId" placeholder="Driver ID" required><br>
-            <button type="submit">Add Ride</button>
-        </form>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <!-- Tabs for Login/Register -->
+    <div class="flex mb-6">
+      <button id="loginTab" class="flex-1 py-2 text-center bg-blue-500 text-white rounded-l-lg">Login</button>
+      <button id="registerTab" class="flex-1 py-2 text-center bg-gray-200 text-gray-700 rounded-r-lg">Register</button>
     </div>
 
-    <!-- Ride List -->
-    <div class="ride-list">
-        <h2>Rides</h2>
-        <div id="ridesList"></div>
+    <!-- Login Form -->
+    <div id="loginForm" class="form-container">
+      <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+      <form id="loginFormElement">
+        <div class="mb-4">
+          <label for="loginEmail" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="loginEmail" name="email" class="mt-1 p-2 w-full border rounded-md" required>
+        </div>
+        <div class="mb-4">
+          <label for="loginPassword" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="loginPassword" name="password" class="mt-1 p-2 w-full border rounded-md" required>
+        </div>
+        <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Login</button>
+      </form>
+      <p id="loginMessage" class="mt-4 text-center text-sm"></p>
     </div>
 
-    <!-- Users Section -->
-    <div class="user-table-container">
-        <h2>Users</h2>
-        <table id="usersTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                </tr>
-            </thead>
-            <tbody id="usersBody"></tbody>
-        </table>
+    <!-- Register Form -->
+    <div id="registerForm" class="form-container hidden">
+      <h2 class="text-2xl font-bold mb-6 text-center">Register</h2>
+      <form id="registerFormElement">
+        <div class="mb-4">
+          <label for="registerUsername" class="block text-sm font-medium text-gray-700">Username</label>
+          <input type="text" id="registerUsername" name="username" class="mt-1 p-2 w-full border rounded-md" required>
+        </div>
+        <div class="mb-4">
+          <label for="registerEmail" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="registerEmail" name="email" class="mt-1 p-2 w-full border rounded-md" required>
+        </div>
+        <div class="mb-4">
+          <label for="registerPassword" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="registerPassword" name="password" class="mt-1 p-2 w-full border rounded-md" required>
+        </div>
+        <div class="mb-4">
+          <label for="registerRole" class="block text-sm font-medium text-gray-700">Role</label>
+          <select id="registerRole" name="role" class="mt-1 p-2 w-full border rounded-md">
+            <option value="customer">Customer</option>
+            <option value="driver">Driver</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Register</button>
+      </form>
+      <p id="registerMessage" class="mt-4 text-center text-sm"></p>
     </div>
+  </div>
 
-    <div class="form-container">
-        <h2>Create a User</h2>
-        <form id="createUserForm">
-            <input type="text" id="userUsername" placeholder="Username" required><br>
-            <input type="email" id="userEmail" placeholder="Email" required><br>
-            <select id="userRole" required>
-                <option value="customer">Customer</option>
-                <option value="driver">Driver</option>
-            </select><br>
-            <button type="submit">Create User</button>
-        </form>
-    </div>
+  <script>
+    // Tab switching
+    const loginTab = document.getElementById('loginTab');
+    const registerTab = document.getElementById('registerTab');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
 
-    <script>
-        const API_BASE_URL = 'http://localhost:3000';
+    loginTab.addEventListener('click', () => {
+      loginTab.classList.add('bg-blue-500', 'text-white');
+      loginTab.classList.remove('bg-gray-200', 'text-gray-700');
+      registerTab.classList.add('bg-gray-200', 'text-gray-700');
+      registerTab.classList.remove('bg-blue-500', 'text-white');
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+    });
 
-        // Fetch and display rides
-        async function fetchRides() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/rides`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const rides = await response.json();
-                const ridesList = document.getElementById('ridesList');
-                ridesList.innerHTML = '';
-                rides.forEach(ride => {
-                    const rideDiv = document.createElement('div');
-                    rideDiv.className = 'ride-item';
-                    rideDiv.innerHTML = `
-                        <div>
-                            <strong>${ride.pickupLocation} to ${ride.destination}</strong><br>
-                            Driver ID: ${ride.driverId}
-                        </div>
-                        <button onclick="cancelRide('${ride._id}')">Cancelled</button>
-                    `;
-                    ridesList.appendChild(rideDiv);
-                });
-            } catch (error) {
-                console.error('Error fetching rides:', error);
-                console.error('Error details:', error.message, error.stack);
-                alert('Failed to fetch rides: ' + error.message);
-            }
-        }
+    registerTab.addEventListener('click', () => {
+      registerTab.classList.add('bg-blue-500', 'text-white');
+      registerTab.classList.remove('bg-gray-200', 'text-gray-700');
+      loginTab.classList.add('bg-gray-200', 'text-gray-700');
+      loginTab.classList.remove('bg-blue-500', 'text-white');
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+    });
 
-        // Fetch and display users
-        async function fetchUsers() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/user`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const users = await response.json();
-                const usersBody = document.getElementById('usersBody');
-                usersBody.innerHTML = '';
-                users.forEach(user => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${user._id}</td>
-                        <td>${user.username}</td>
-                        <td>${user.email}</td>
-                        <td>${user.role}</td>
-                    `;
-                    usersBody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                console.error('Error details:', error.message, error.stack);
-                alert('Failed to fetch users: ' + error.message);
-            }
-        }
+    // API Base URL
+    const API_URL = 'http://localhost:3000';
 
-        // Create a new ride
-        document.getElementById('createRideForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const ride = {
-                pickupLocation: document.getElementById('ridePickup').value,
-                destination: document.getElementById('rideDestination').value,
-                driverId: document.getElementById('rideDriverId').value,
-                status: 'requested' // Default status as per API logic
-            };
-            try {
-                const response = await fetch(`${API_BASE_URL}/rides`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(ride)
-                });
-                if (response.ok) {
-                    alert('Ride created successfully');
-                    fetchRides();
-                    e.target.reset();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to create ride');
-                }
-            } catch (error) {
-                console.error('Error creating ride:', error);
-                alert('Failed to create ride: ' + error.message);
-            }
+    // Login Form Submission
+    document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const messageEl = document.getElementById('loginMessage');
+
+      try {
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
         });
 
-        // Create a new user
-        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const user = {
-                username: document.getElementById('userUsername').value,
-                email: document.getElementById('userEmail').value,
-                role: document.getElementById('userRole').value
-            };
-            try {
-                const response = await fetch(`${API_BASE_URL}/user`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(user)
-                });
-                if (response.ok) {
-                    alert('User created successfully');
-                    fetchUsers();
-                    e.target.reset();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to create user');
-                }
-            } catch (error) {
-                console.error('Error creating user:', error);
-                alert('Failed to create user: ' + error.message);
-            }
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          messageEl.classList.remove('text-red-500');
+          messageEl.classList.add('text-green-500');
+          messageEl.textContent = 'Login successful! Token stored.';
+        } else {
+          messageEl.classList.remove('text-green-500');
+          messageEl.classList.add('text-red-500');
+          messageEl.textContent = data.error || 'Login failed';
+        }
+      } catch (err) {
+        messageEl.classList.remove('text-green-500');
+        messageEl.classList.add('text-red-500');
+        messageEl.textContent = 'Error connecting to server';
+      }
+    });
+
+    // Register Form Submission
+    document.getElementById('registerFormElement').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('registerUsername').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const role = document.getElementById('registerRole').value;
+      const messageEl = document.getElementById('registerMessage');
+
+      try {
+        const response = await fetch(`${API_URL}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password, role })
         });
 
-        // Cancel a ride (update status to 'cancelled')
-        async function cancelRide(rideId) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/rides/${rideId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'cancelled' })
-                });
-                if (response.ok) {
-                    alert('Ride cancelled');
-                    fetchRides();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Failed to cancel ride');
-                }
-            } catch (error) {
-                console.error('Error cancelling ride:', error);
-                alert('Failed to cancel ride: ' + error.message);
-            }
+        const data = await response.json();
+        if (response.ok) {
+          messageEl.classList.remove('text-red-500');
+          messageEl.classList.add('text-green-500');
+          messageEl.textContent = 'Registration successful! You can now login.';
+        } else {
+          messageEl.classList.remove('text-green-500');
+          messageEl.classList.add('text-red-500');
+          messageEl.textContent = data.error || 'Registration failed';
         }
-
-        // Initial fetch
-        fetchRides();
-        fetchUsers();
-    </script>
+      } catch (err) {
+        messageEl.classList.remove('text-green-500');
+        messageEl.classList.add('text-red-500');
+        messageEl.textContent = 'Error connecting to server';
+      }
+    });
+  </script>
 </body>
 </html>
