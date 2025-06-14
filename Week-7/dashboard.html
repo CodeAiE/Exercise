@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passenger Ride Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Passenger Ride Statistics</h2>
+    <div class="chart-container">
+      <canvas id="rideChart"></canvas>
+    </div>
+    <h3>Passenger Ride Data</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Total Rides</th>
+          <th>Total Fare ($)</th>
+          <th>Average Distance (km)</th>
+        </tr>
+      </thead>
+      <tbody id="dataTable">
+        <!-- Data will be populated via JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Chart configuration
+    const ctx = document.getElementById('rideChart').getContext('2d');
+    const rideChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ["Alice", "Bob"],
+        datasets: [
+          {
+            label: "Total Fare ($)",
+            data: [37.8, 18.75],
+            backgroundColor: "rgba(54, 162, 235, 0.8)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1
+          },
+          {
+            label: "Average Distance (km)",
+            data: [10.35, 9.8],
+            backgroundColor: "rgba(255, 99, 132, 0.8)",
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Value"
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Passenger"
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: "top"
+          },
+          title: {
+            display: true,
+            text: "Passenger Ride Statistics"
+          }
+        }
+      }
+    });
+
+    // Populate table with data
+    const data = [
+      { name: "Alice", totalRides: 2, totalfare: 37.8, avgDistance: 10.35 },
+      { name: "Bob", totalRides: 1, totalfare: 18.75, avgDistance: 9.8 }
+    ];
+
+    const tableBody = document.getElementById('dataTable');
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.name}</td>
+        <td>${row.totalRides}</td>
+        <td>${row.totalfare.toFixed(2)}</td>
+        <td>${row.avgDistance.toFixed(2)}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  </script>
+</body>
+</html>
